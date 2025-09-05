@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
-import { useDispatch  } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addItem } from './CartSlice';
 
 function ProductList({ onHomeClick }) {
@@ -14,7 +14,15 @@ function ProductList({ onHomeClick }) {
     // Setup: Redux Dispatch
     const dispatch = useDispatch();
 
+    const cart = useSelector((state) => state.cart.items);
+    const totalCartQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+
+    // keep this only once
+    const handleAddToCart = (plant) => {
+    dispatch(addItem(plant));
+    setAddedToCart((prev) => ({ ...prev, [plant.name]: true }));
+    };
     const plantsArray = [
         {
             category: "Air Purifying Plants",
@@ -223,9 +231,6 @@ function ProductList({ onHomeClick }) {
         }
     ];
 
-    const handleAddToCart = (plant) => {
-        dispatch(addItem(plant)); // Send plant to global cart slice
-    };
 
     const styleObj = {
         backgroundColor: '#4CAF50',
@@ -304,7 +309,7 @@ function ProductList({ onHomeClick }) {
                                         {/* Add to cart button with added state */}
 
                                         <button onClick={() => handleAddToCart(plant)}
-                                                disabled={addedToCart(plant.name)}
+                                                disabled={addedToCart[plant.name]}
                                         >
                                             {addedToCart[plant.name] ? "Added to Cart" : "Add to Cart"}
                                         </button>
